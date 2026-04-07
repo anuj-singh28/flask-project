@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Backend is running"
+    return "Backend is running fine"
 
 @app.route('/submit', methods=['POST'])
 def submit():
