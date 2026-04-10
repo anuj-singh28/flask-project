@@ -9,6 +9,25 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/todo')
+def todo_page():
+    return render_template('todo.html')
+
+@app.route('/submittodoitem', methods=['POST'])
+def submit_todo_item():
+    try:
+        form_data = dict(request.form)
+        response = requests.post(BACKEND_URL + '/submittodoitem', json=form_data)
+        data = response.json()
+        if data.get("success"):
+            return 'Todo item submitted successfully!'
+        else:
+            return render_template("index.html", error=data.get("message"))
+    except requests.exceptions.ConnectionError:
+        return render_template("todo.html", error="Backend server is not reachable")
+    except Exception:
+        return render_template("todo.html", error="Something went wrong")
+
 @app.route('/submit', methods=['POST'])
 def submit():
 
