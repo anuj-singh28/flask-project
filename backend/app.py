@@ -10,12 +10,43 @@ MONGO_URI = os.getenv('MONGO_URI')
 client = pymongo.MongoClient(MONGO_URI)
 db = client.test
 collection = db['form_data']
+todo_collection = db["todo_items"]
 
 app = Flask(__name__) 
 
 @app.route('/')
 def home():
     return "Backend is running fine"
+
+@app.route('/submittodoitem', methods=['POST'])
+def submit_todo():
+    try:
+        form_data = request.get_json()
+
+        title = form_data.get("title")
+        description = form_data.get("description")
+
+        todo_collection.insert_one({
+            "title": title,
+            "description": description
+        })
+
+        return jsonify({
+            "success": True,
+            "message": "Todo item submitted successfully"
+        }), 200
+
+    except pymongo.errors.ServerSelectionTimeoutError:
+        return jsonify({
+            "success": False,
+            "message": "Database not available"
+        }), 500
+
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Something went wrong"
+        }), 500
 
 @app.route('/submit', methods=['POST'])
 def submit():
